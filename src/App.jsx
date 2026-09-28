@@ -415,8 +415,8 @@ export default function App() {
     <Scenario.Provider value={scenario}>
       <div className="app" inert={openItem ? '' : undefined}>
         <a className="skip" href="#needs-h">Skip to what needs you</a>
-        <header className="toolbar" aria-label="Agent Spaces">
-          <div className="toolbar-brand"><span className="toolbar-mark" aria-hidden="true" /><h1>Agent Spaces</h1></div>
+        <header className="toolbar" aria-label="Atelier">
+          <div className="toolbar-brand"><span className="toolbar-mark" aria-hidden="true" /><h1>Atelier</h1></div>
           <nav className="toolbar-nav" aria-label="Page sections">
             <a href="#needs-h">Needs you</a><a href="#rounds-h">Rounds</a><a href="#canvas-h">Project</a><a href="#set-h">Rules</a>
           </nav>
@@ -440,9 +440,7 @@ export default function App() {
           <Settings settings={settings} onChange={(id, v) => setSettings(s => s.map(x => x.id === id ? { ...x, value: v } : x))} />
         </main>
 
-        <footer className="foot">
-          <a href="https://armanmusaji.com/ai-workflow-experiments/agent-spaces">About this prototype</a>
-        </footer>
+
       </div>
       {openItem && <Ruling item={openItem} onRule={rule} onClose={close} />}
     </Scenario.Provider>

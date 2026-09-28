@@ -2,6 +2,8 @@
 
 A clickable prototype of a feature concept for a design tool: a project page where a designer can see what two AI agents need decided, inspect the work, and rule beside it. Part of Arman Musaji's AI Workflow Experiments series.
 
+The fictional design tool in the prototype is called Atelier. Agent Spaces is the name of the experiment and of the feature concept; inside the tool the agents' areas are simply called spaces. The prototype page shows only the tool and the fictional project inside it; the framing, disclaimers and credits live here and in the case study.
+
 Self-initiated. The design tool, the library and the people are fictional. The two agents are scripted; no live AI runs inside the prototype. The content comes from a real working trial in which Claude and GPT Astra built the two directions in Figma with Arman ruling between rounds.
 
 - Case study: https://armanmusaji.com/ai-workflow-experiments/agent-spaces
