@@ -1,12 +1,30 @@
-# Agent Spaces (prototype)
+# Agent Spaces
 
-Project 3 of Arman Musaji's AI Workflow Experiments. A clickable prototype of one project page in a fictional design tool where a designer runs two AI agents and stays in charge. Self-initiated; not affiliated with any company. Agents are scripted; no live AI. Content comes from a real working trial (Harbor Street Library, fictional).
+A clickable prototype of a feature concept for a design tool: a project page where a designer can see what two AI agents need decided, inspect the work, and rule beside it. Part of Arman Musaji's AI Workflow Experiments series.
 
-First slice (2026-09-27): needs-you strip with three real decisions, two agent spaces with the trial's screens rebuilt as DOM, per-screen notes, one ruling flow end to end with undo, rounds, editing rules and labeled trial settings. Desktop and phone. Light and dark.
+Self-initiated. The design tool, the library and the people are fictional. The two agents are scripted; no live AI runs inside the prototype. The content comes from a real working trial in which Claude and GPT Astra built the two directions in Figma with Arman ruling between rounds.
 
-## Run
-    npm install
-    npm run dev
+- Case study: https://armanmusaji.com/ai-workflow-experiments/agent-spaces
+- Prototype: https://agent-spaces.vercel.app
 
-## Build
-    npm run build
+## Detail pages
+
+- [Research and context](docs/research.md)
+- [The trial](docs/trial.md)
+- [Learnings and effort](docs/learnings.md)
+- [Reviews](docs/critiques.md)
+- [Decisions](docs/decisions.md)
+- [The review kit](docs/kit.md)
+
+## Run it
+
+```
+npm install
+npm run dev
+```
+
+`npm run build` produces the site in `dist/`. `npx vite build --config vite.artifact.config.js` produces a single-file bundle in `dist-artifact/` used for hosted review builds. `checks/host-check.mjs` renders the single-file page inside a simulated host that defines colliding CSS variable names, in light and dark.
+
+## Credits
+
+Directed by Arman Musaji, who set the process and made every ruling. Claude led scope, the trial setup, Direction A and the build. GPT Astra built Direction B, critiqued at each gate and ran the build review and rechecks. Type: Public Sans.

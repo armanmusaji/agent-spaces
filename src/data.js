@@ -38,7 +38,7 @@ export const SPACES = [
       },
       {
         id: 'a2', title: 'Choose a session', pills: [
-          { n: 1, y: 21, tag: 'The sheet', note: 'Choose a session and enter details in one sheet over the event page. A way back other than the handle is proposed by Astra and waits for your ruling.' },
+          { n: 1, y: 19, tag: 'The sheet', note: 'Choose a session and enter details in one sheet over the event page. A way back other than the handle is proposed by Astra and waits for your ruling.' },
           { n: 2, y: 40, tag: 'Full session', note: 'Shown as Full. The selector is hidden so it no longer looks choosable. A waitlist would need a change to the shared Session row; Claude has asked.' },
           { n: 3, y: 62, tag: 'Your details', note: 'The sheet scrolls inside itself. The Sign up button stays pinned; the focused field scrolls above the keyboard. Written, not drawn.' },
           { n: 4, y: 88, tag: 'Sign up button', note: 'The button names the date, so one tap cannot sign up for the wrong session.' },
