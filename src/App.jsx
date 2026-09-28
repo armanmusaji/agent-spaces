@@ -415,21 +415,23 @@ export default function App() {
     <Scenario.Provider value={scenario}>
       <div className="app" inert={openItem ? '' : undefined}>
         <a className="skip" href="#needs-h">Skip to what needs you</a>
-        <header className="top">
-          <div>
-            <p className="eyebrow">Project page · Harbor Street Library · Event signup</p>
-            <h1>Agent Spaces</h1>
-          </div>
-          <div className="top-right">
-            <p className="top-note">Fictional design tool. Two scripted agents. Content from a real working trial.</p>
-            <button className="btn btn-quiet btn-sm" onClick={reset}>Reset demo</button>
-          </div>
+        <header className="toolbar" aria-label="Agent Spaces">
+          <div className="toolbar-brand"><span className="toolbar-mark" aria-hidden="true" /><h1>Agent Spaces</h1></div>
+          <nav className="toolbar-nav" aria-label="Page sections">
+            <a href="#needs-h">Needs you</a><a href="#rounds-h">Rounds</a><a href="#canvas-h">Project</a><a href="#set-h">Rules</a>
+          </nav>
+          <button className="btn btn-quiet btn-sm" onClick={reset}>Reset demo</button>
         </header>
 
         <main>
           <NeedsYou items={items} onOpen={open} history={history} onUndo={undo} onJump={id => { setCollapseTick(t => t + 1); goTo(items.find(i => i.id === id)) }} phone={phone} collapseTick={collapseTick} expandTick={expandTick} />
           <Rounds rounds={ROUNDS} reviewing={reviewing} mode={modeVal} next={nextVal} />
 
+          <header className="canvas-head">
+            <p className="eyebrow">Project page</p>
+            <h2 id="canvas-h">Harbor Street Library · Event signup</h2>
+            <p className="canvas-sub">Two directions for the library's mobile signup flow, three screens each. Notes are pinned to the screens; rule where the work is.</p>
+          </header>
           <div className={'spaces' + (modeVal === 0 ? ' spaces-shared' : ' spaces-separate')}>
             {modeVal === 0 && <p className="spaces-label">Round 2 · one shared space. Both directions on one canvas, same rules, attribution on every object.</p>}
             {SPACES.map(sp => <Space key={sp.id} space={sp} status={spaceStatus[sp.id]} marks={marks} focus={focus} setFocus={setFocus} highlighted={hi === sp.id} forceOpen={forceOpen[sp.id]} notes={notes} mode={modeVal} next={nextVal} />)}
@@ -439,7 +441,7 @@ export default function App() {
         </main>
 
         <footer className="foot">
-          <p>Self-initiated concept. Not affiliated with any company. Agents are scripted; nothing here claims real agents obey these boundaries. The phone screens are design previews, not a working signup app.</p>
+          <a href="https://armanmusaji.com/ai-workflow-experiments/agent-spaces">About this prototype</a>
         </footer>
       </div>
       {openItem && <Ruling item={openItem} onRule={rule} onClose={close} />}
