@@ -200,7 +200,7 @@ function Screen({ screen, spaceAgent, marks, focusPill, onPill, notes = {} }) {
         {marks.map(m => <span key={m.id} className={'mark mark-' + m.kind} style={{ top: `${m.y}%` }}>{m.label}</span>)}
       </div>
       <div className="legend">
-        <h4>{screen.title}: why it is like this <span className="legend-tag">design preview, not a working app</span></h4>
+        <h4><span>{screen.title}: why it is like this</span><span className="legend-tag">Design preview, not a working app</span></h4>
         <ol>
           {screen.pills.map(p => (
             <li key={p.n} id={`leg-${screen.id}-${p.n}`} className={focusPill === p.n ? 'leg-focus' : ''}>
