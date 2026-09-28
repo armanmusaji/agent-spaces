@@ -167,6 +167,11 @@ legend { font-weight: 600; margin-bottom: 4px; }
 .status { font-weight: 600; }
 .status-review { color: var(--as-ok); }
 .space-hi { transition: box-shadow 0.3s; }
+.space-rules { font-size: 13px; color: var(--as-ink-2); margin-top: 6px; }
+.spaces-shared { border: 2px dashed var(--as-line); border-radius: 20px; padding: 12px; gap: 12px; }
+.spaces-label { font-size: 13px; color: var(--as-ink-2); padding: 0 6px; }
+.spaces-separate { gap: 32px; }
+.setting-effect { font-size: 14px; max-width: 70ch; padding: 8px 10px; background: var(--as-surface-2); border-radius: 8px; }
 
 /* settings */
 .settings { border: 1px solid var(--as-line); border-radius: var(--as-radius); padding: 16px; background: var(--as-surface); display: grid; gap: 12px; }

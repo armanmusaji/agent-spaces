@@ -159,18 +159,18 @@ function Ruling({ item, onRule, onClose }) {
 
 /* ---------- rounds ---------- */
 
-function Rounds({ rounds, reviewing }) {
+function Rounds({ rounds, reviewing, mode, next }) {
   return (
     <section className="rounds" aria-labelledby="rounds-h">
       <h2 id="rounds-h">Rounds</h2>
       <ol className="round-list">
         {rounds.map(r => (
           <li key={r.id} className="round">
-            <div className="round-name">{r.name} <span className="mode">{r.mode}</span></div>
+            <div className="round-name">{r.name} <span className="mode">{r.id === 'r2' ? (mode === 0 ? 'Shared space' : 'Separate spaces') : r.mode}</span></div>
             <ol className="steps">
               {r.steps.map((s, i) => <li key={s} className={i < r.done ? 'done' : i === r.done ? 'now' : ''}>{s}{r.id === 'r2' && s === 'Review' && reviewing ? ' · in progress' : ''}</li>)}
             </ol>
-            {r.ruling ? <p className="round-ruling"><strong>Ruling:</strong> {r.ruling}</p> : <p className="round-ruling muted">{reviewing ? 'Review is open. Pick comes after both agents have reviewed.' : 'Ruling comes after Pick.'}</p>}
+            {r.ruling ? <p className="round-ruling"><strong>Ruling:</strong> {r.id === 'r1' ? (next === 0 ? 'Both directions carried forward with agreed fixes. Each carried-forward object names its next editor; Astra on hers, Claude on his, proposals across.' : 'Both directions carried forward with agreed fixes. Astra takes the next turn on every carried-forward object; Claude proposes.') : r.ruling}</p> : <p className="round-ruling muted">{reviewing ? 'Review is open. Pick comes after both agents have reviewed.' : 'Ruling comes after Pick.'}</p>}
           </li>
         ))}
       </ol>
@@ -219,19 +219,24 @@ function Screen({ screen, spaceAgent, marks, focusPill, onPill, notes = {} }) {
   )
 }
 
-function Space({ space, status, marks, focus, setFocus, highlighted, forceOpen, notes }) {
+function Space({ space, status, marks, focus, setFocus, highlighted, forceOpen, notes, mode, next }) {
   const phone = useIsPhone()
   const [openOnPhone, setOpenOnPhone] = useState(false)
   useEffect(() => { if (focus && space.screens.some(s => s.id === focus.screen)) setOpenOnPhone(true) }, [focus, space.screens])
   useEffect(() => { if (forceOpen) setOpenOnPhone(true) }, [forceOpen])
   const show = !phone || openOnPhone
   const statusText = status === 'review' ? 'In review · Claude proposes next' : 'Ready for review'
+  const editLine = next === 0
+    ? `Edits here: ${AGENTS[space.agent].name} on ${space.agent === 'claude' ? 'his' : 'her'} own objects; the other agent proposes.`
+    : `Edits here: Astra's turn on every carried-forward object; Claude proposes.`
+  const modeLine = mode === 0 ? 'Round 2 · shared space with the other direction' : 'Round 2 · own space'
   return (
     <section id={'space-' + space.id} className={`space space-${space.agent}` + (highlighted ? ' space-hi' : '')} aria-labelledby={'sp-' + space.id}>
       <header className="space-head">
         <div className="space-owner"><Agent id={space.agent} /> · <span className={'status status-' + status}>{statusText}</span></div>
         <h3 id={'sp-' + space.id}>{space.title}</h3>
         <p className="bet">{space.bet}</p>
+        <p className="space-rules"><span>{modeLine}</span> · <span>{editLine}</span></p>
       </header>
       {phone && (
         <button className="btn btn-quiet phone-toggle" aria-expanded={show} onClick={() => setOpenOnPhone(v => !v)}>
@@ -267,6 +272,7 @@ function Settings({ settings, onChange }) {
               <button key={o} className={'seg-b' + (s.value === i ? ' on' : '')} aria-pressed={s.value === i} onClick={() => onChange(s.id, i)}>{o}</button>
             ))}
           </div>
+          <p className="setting-effect" aria-live="polite"><strong>On this page now:</strong> {s.effects[s.value]}</p>
           <p className="setting-why">{s.why}</p>
         </div>
       ))}
@@ -369,6 +375,8 @@ export default function App() {
   }), [log, items])
 
   const p1 = items.find(i => i.id === 'p1'), x1 = items.find(i => i.id === 'x1')
+  const modeVal = settings.find(s => s.id === 'mode').value
+  const nextVal = settings.find(s => s.id === 'next').value
   const scenario = {
     sheetClose: p1?.resolution?.id === 'agree',
     waitlist: x1?.resolution?.id === 'allow' ? 'all' : x1?.resolution?.id === 'copy' ? 'a' : 'none',
@@ -420,10 +428,11 @@ export default function App() {
 
         <main>
           <NeedsYou items={items} onOpen={open} history={history} onUndo={undo} onJump={id => { setCollapseTick(t => t + 1); goTo(items.find(i => i.id === id)) }} phone={phone} collapseTick={collapseTick} expandTick={expandTick} />
-          <Rounds rounds={ROUNDS} reviewing={reviewing} />
+          <Rounds rounds={ROUNDS} reviewing={reviewing} mode={modeVal} next={nextVal} />
 
-          <div className="spaces">
-            {SPACES.map(sp => <Space key={sp.id} space={sp} status={spaceStatus[sp.id]} marks={marks} focus={focus} setFocus={setFocus} highlighted={hi === sp.id} forceOpen={forceOpen[sp.id]} notes={notes} />)}
+          <div className={'spaces' + (modeVal === 0 ? ' spaces-shared' : ' spaces-separate')}>
+            {modeVal === 0 && <p className="spaces-label">Round 2 · one shared space. Both directions on one canvas, same rules, attribution on every object.</p>}
+            {SPACES.map(sp => <Space key={sp.id} space={sp} status={spaceStatus[sp.id]} marks={marks} focus={focus} setFocus={setFocus} highlighted={hi === sp.id} forceOpen={forceOpen[sp.id]} notes={notes} mode={modeVal} next={nextVal} />)}
           </div>
 
           <Settings settings={settings} onChange={(id, v) => setSettings(s => s.map(x => x.id === id ? { ...x, value: v } : x))} />

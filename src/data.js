@@ -126,8 +126,10 @@ export const ROUNDS = [
 
 export const TRIAL_SETTINGS = [
   { id: 'next', label: 'Who edits next', options: ['Per object', 'Per turn'], value: 0,
+    effects: ['Each space says its owner edits its own objects and the other agent proposes. The Round 1 ruling names the next editor per object.', 'Each space says it is Astra\'s turn on every carried-forward object and Claude proposes. The Round 1 ruling names Astra for the whole turn.'],
     why: 'Trial setting. Two agents worked side by side without collisions when their territories were separate. Live editing of the same object was never tested.' },
   { id: 'mode', label: 'Round 2 default', options: ['Shared space', 'Separate spaces'], value: 0,
+    effects: ['The two directions sit inside one shared space with one label, and Round 2 reads Shared space.', 'Each direction sits in its own space with its own border, and Round 2 reads Separate spaces.'],
     why: 'Trial setting. Same rules either way; only the default changes. Attribution travels with the object in both.' },
 ]
 
