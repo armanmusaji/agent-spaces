@@ -22,13 +22,13 @@ export const EVENT = {
 }
 
 // Spaces on the page. Round 2 shared space holds both directions.
+// Screen state at the moment the director opens the page: the proposal on A2 is NOT yet applied (F7).
 export const SPACES = [
   {
     id: 'a',
     agent: 'claude',
     title: 'Direction A · Detail first, choose in a sheet',
     bet: 'The event page is home base. Choosing a session and entering details happen in a sheet over it, so the person never leaves the event.',
-    status: 'ready',
     screens: [
       {
         id: 'a1', title: 'Event detail', pills: [
@@ -38,8 +38,8 @@ export const SPACES = [
       },
       {
         id: 'a2', title: 'Choose a session', pills: [
-          { n: 1, y: 21, tag: 'The sheet', note: 'Choose a session and enter details in one sheet over the event page. An X and a Back to event link keep entered details.', agreed: 'Round 1 ruling applied.' },
-          { n: 2, y: 40, tag: 'Full session', note: 'Shown as Full with no waitlist. The selector is hidden so it no longer looks choosable.', agreed: 'Round 1 ruling applied.' },
+          { n: 1, y: 21, tag: 'The sheet', note: 'Choose a session and enter details in one sheet over the event page. A way back other than the handle is proposed by Astra and waits for your ruling.' },
+          { n: 2, y: 40, tag: 'Full session', note: 'Shown as Full. The selector is hidden so it no longer looks choosable. A waitlist would need a change to the shared Session row; Claude has asked.' },
           { n: 3, y: 62, tag: 'Your details', note: 'The sheet scrolls inside itself. The Sign up button stays pinned; the focused field scrolls above the keyboard. Written, not drawn.' },
           { n: 4, y: 88, tag: 'Sign up button', note: 'The button names the date, so one tap cannot sign up for the wrong session.' },
         ],
@@ -57,7 +57,6 @@ export const SPACES = [
     agent: 'astra',
     title: 'Direction B · A clear step at a time',
     bet: 'Full pages keep signup and the receipt clear. The count now starts at signup, not on the event page.',
-    status: 'ready',
     screens: [
       {
         id: 'b1', title: 'Event detail', pills: [
@@ -83,36 +82,38 @@ export const SPACES = [
 ]
 
 // What needs the director right now. Three real items from the trial, reset to open.
+// kind: proposal | exception | ready. Each choice carries a `status` the item takes afterwards:
+// closed (done), deferred (comes back next round), open (still waiting, e.g. Later).
 export const INITIAL_ITEMS = [
   {
     id: 'p1', kind: 'proposal', from: 'astra', on: 'claude', target: { space: 'a', screen: 'a2', pill: 1 },
     title: 'Astra proposes a fix on Direction A, screen 2',
-    body: 'Add a visible Close or Back to event on the sheet, and keep the chosen session and entered details when the person returns. The handle suggests a gesture; nothing explicit says how to get back.',
+    body: 'Add a visible Close and a Back to event link on the sheet, and keep the chosen session and entered details when the person returns. Today the handle is the only way back.',
     reply: 'Claude: accept.',
     choices: [
-      { id: 'agree', label: 'Agree', result: 'Claude applies it in the next develop turn. The proposal is closed as agreed.' },
-      { id: 'decline', label: 'Decline', result: 'The sheet stays as it is. The proposal is closed as declined, with the reason kept.' },
-      { id: 'defer', label: 'Defer', result: 'Stays open, marked deferred. It returns to this list at the next round.' },
+      { id: 'agree', label: 'Agree', status: 'closed', result: 'Claude applies it now: an X and a Back to event link appear on the sheet. Undo removes them.' },
+      { id: 'decline', label: 'Decline', status: 'closed', result: 'The sheet stays as it is. The proposal is closed as declined, with the reason kept.' },
+      { id: 'defer', label: 'Defer', status: 'deferred', result: 'Nothing changes now. The proposal is parked and returns to this list at the next round.' },
     ],
   },
   {
-    id: 'x1', kind: 'exception', from: 'claude', target: { space: 'shared', screen: null, pill: null },
+    id: 'x1', kind: 'exception', from: 'claude', target: { space: 'a', screen: 'a2', pill: 2 },
     title: 'Claude asks to change a shared part: Session row',
     body: 'Direction A wants a Waitlist state on the full session. Session row is shared by both directions and instance overrides cannot add a state. The library itself is not involved and is not an option.',
     reach: 'Reaches: 6 instances on this page (3 in each direction). Undoable.',
     choices: [
-      { id: 'allow', label: 'Allow once', result: 'Exactly this change to Session row, for this request only. Every instance on the page updates. Attributed to Claude, undoable. No wider access follows.' },
-      { id: 'copy', label: 'Make a local copy', result: 'Claude works on a copy inside Direction A. The copy stops receiving updates from the original. Direction B is unchanged.' },
-      { id: 'decline', label: 'Decline', result: 'Session row stays unchanged. Direction A continues without a waitlist and says so, rather than reporting done.' },
+      { id: 'allow', label: 'Allow once', status: 'closed', result: 'Exactly this change to Session row, for this request only. The full session in both directions gains a Join waitlist action. Attributed to Claude. Undo reverses it. No wider access follows.' },
+      { id: 'copy', label: 'Make a local copy', status: 'closed', result: 'Claude works on a copy inside Direction A. Only Direction A\'s full session gains Join waitlist. The copy stops receiving updates from the original. Direction B is unchanged.' },
+      { id: 'decline', label: 'Decline', status: 'closed', result: 'Session row stays unchanged. Direction A continues without a waitlist and says so, rather than reporting done.' },
     ],
   },
   {
-    id: 'r1', kind: 'ready', from: 'astra', target: { space: 'b', screen: null, pill: null },
+    id: 'r1', kind: 'ready', from: 'astra', target: { space: 'b', screen: 'b1', pill: null },
     title: 'Astra marked Direction B ready for review',
     body: 'Three screens and their notes are complete. Nothing is accepted by itself; your review starts the next phase.',
     choices: [
-      { id: 'review', label: 'Start review', result: 'Direction B opens for review. Claude is asked to file proposals on it.' },
-      { id: 'later', label: 'Later', result: 'Stays ready. It remains in this list until you open it.' },
+      { id: 'review', label: 'Start review', status: 'closed', result: 'Direction B is marked in review and its screens open. Claude is asked to file proposals on it. The round stays at Review until that is done.' },
+      { id: 'later', label: 'Later', status: 'open', result: 'Stays in this list, marked Later, until you open it.' },
     ],
   },
 ]

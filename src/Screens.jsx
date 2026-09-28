@@ -1,4 +1,9 @@
+import { createContext, useContext } from 'react'
 import { EVENT } from './data.js'
+
+// What the director has ruled so far, as it shows up in the fictional product.
+// sheetClose: proposal p1 agreed. waitlist: 'none' | 'all' (allow once) | 'a' (local copy in Direction A).
+export const Scenario = createContext({ sheetClose: false, waitlist: 'none' })
 
 // The six trial screens, rebuilt as DOM at 390 x 844. Fictional product; no Figma UI.
 
@@ -10,15 +15,16 @@ function Row({ k, v }) {
   return <div className="ph-row"><span className="ph-k">{k}</span><span className="ph-v">{v}</span></div>
 }
 
-function SessionRow({ s, state }) {
+function SessionRow({ s, state, waitlist }) {
   const full = s.seats === 0
   return (
     <div className={'ph-sess ph-sess-' + state}>
       <div className="ph-sess-text">
         <div className="ph-sess-when">{s.when}</div>
-        <div className={'ph-sess-seats' + (full ? ' full' : '')}>{full ? 'Full. No waitlist for this session.' : `${s.seats} seats left`}</div>
+        <div className={'ph-sess-seats' + (full ? ' full' : '')}>{full ? (waitlist ? 'Full. Waitlist open.' : 'Full. No waitlist for this session.') : `${s.seats} seats left`}</div>
       </div>
       {!full && <span className={'ph-radio' + (state === 'sel' ? ' on' : '')} aria-hidden="true" />}
+      {full && waitlist && <span className="ph-chip">Join waitlist</span>}
     </div>
   )
 }
@@ -58,6 +64,8 @@ export function A1() {
 }
 
 export function A2() {
+  const sc = useContext(Scenario)
+  const wl = sc.waitlist === 'all' || sc.waitlist === 'a'
   return (
     <Phone dim>
       <div className="ph-top"><span className="ph-link">‹ Events</span></div>
@@ -68,12 +76,12 @@ export function A2() {
           <div>
             <div className="ph-h2">Choose a session</div>
             <div className="ph-cap">{EVENT.title} · 90 minutes</div>
-            <div className="ph-cap ph-linkc">Back to event keeps your choices</div>
+            {sc.sheetClose && <div className="ph-cap ph-linkc">Back to event keeps your choices</div>}
           </div>
-          <span className="ph-x" aria-hidden="true">✕</span>
+          {sc.sheetClose && <span className="ph-x" aria-hidden="true">✕</span>}
         </div>
         <SessionRow s={EVENT.sessions[0]} state="def" />
-        <SessionRow s={EVENT.sessions[1]} state="full" />
+        <SessionRow s={EVENT.sessions[1]} state="full" waitlist={wl} />
         <SessionRow s={EVENT.sessions[2]} state="sel" />
         <div className="ph-label">Your details</div>
         <Field label="Name" value="Ada Okafor" />
@@ -133,6 +141,7 @@ export function B1() {
 }
 
 export function B2() {
+  const sc = useContext(Scenario)
   return (
     <Phone>
       <div className="ph-top ph-stack"><span className="ph-status">9:41</span><span className="ph-link">Back to event</span><span className="ph-cap">Step 1 of 2 · Sign up</span></div>
@@ -140,7 +149,7 @@ export function B2() {
         <div className="ph-title">Choose a session</div>
         <div className="ph-cap">{EVENT.title}</div>
         <SessionRow s={EVENT.sessions[0]} state="sel" />
-        <SessionRow s={EVENT.sessions[1]} state="full" />
+        <SessionRow s={EVENT.sessions[1]} state="full" waitlist={sc.waitlist === 'all'} />
         <SessionRow s={EVENT.sessions[2]} state="def" />
         <div className="ph-label">Your details</div>
         <Field label="Name" value="Alex Morgan" />
