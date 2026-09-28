@@ -7,7 +7,11 @@ Self-initiated. The design tool, the library and the people are fictional. The t
 - Case study: https://armanmusaji.com/ai-workflow-experiments/agent-spaces
 - Prototype: https://agent-spaces.vercel.app
 
+![The needs-you strip with three open decisions](docs/figures/fig1-needs-you.png)
+
 ## Detail pages
+
+Figures used in the case study are in `docs/figures/` with their provenance in the [figures note](docs/figures/README.md).
 
 - [Research and context](docs/research.md)
 - [The trial](docs/trial.md)
