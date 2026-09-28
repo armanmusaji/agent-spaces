@@ -116,7 +116,10 @@ function Ruling({ item, onRule, onClose }) {
     const onKey = e => {
       if (e.key === 'Escape') { e.preventDefault(); onClose(); return }
       if (e.key !== 'Tab' || !box.current) return
-      const f = [...box.current.querySelectorAll('input:not([disabled]), button:not([disabled])')]
+      const all = [...box.current.querySelectorAll('input:not([disabled]), button:not([disabled])')]
+      const radios = all.filter(x => x.type === 'radio')
+      const stop = radios.find(x => x.checked) || radios[0]
+      const f = all.filter(x => x.type !== 'radio' || x === stop)
       if (!f.length) return
       const first = f[0], last = f[f.length - 1]
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
@@ -177,7 +180,7 @@ function Rounds({ rounds, reviewing }) {
 
 /* ---------- spaces ---------- */
 
-function Screen({ screen, spaceAgent, marks, focusPill, onPill }) {
+function Screen({ screen, spaceAgent, marks, focusPill, onPill, notes = {} }) {
   const wrap = useRef(null)
   const s = useScale(wrap)
   const Cmp = SCREEN_COMPONENTS[screen.id]
@@ -204,7 +207,8 @@ function Screen({ screen, spaceAgent, marks, focusPill, onPill }) {
               <span className={`pill pill-static pill-${p.editedBy || spaceAgent}`} aria-hidden="true">{p.n}</span>
               <div>
                 <div className="leg-tag">{p.tag}{p.editedBy && <> · <Agent id={spaceAgent} edited={p.editedBy} /></>}</div>
-                <div className="leg-note">{p.note}</div>
+                <div className="leg-note">{notes[p.n] ? notes[p.n].note : p.note}</div>
+                {notes[p.n] && <div className="leg-ruled">{notes[p.n].ruled}</div>}
                 {p.agreed && <div className="leg-agreed">{p.agreed}</div>}
               </div>
             </li>
@@ -215,7 +219,7 @@ function Screen({ screen, spaceAgent, marks, focusPill, onPill }) {
   )
 }
 
-function Space({ space, status, marks, focus, setFocus, highlighted, forceOpen }) {
+function Space({ space, status, marks, focus, setFocus, highlighted, forceOpen, notes }) {
   const phone = useIsPhone()
   const [openOnPhone, setOpenOnPhone] = useState(false)
   useEffect(() => { if (focus && space.screens.some(s => s.id === focus.screen)) setOpenOnPhone(true) }, [focus, space.screens])
@@ -239,6 +243,7 @@ function Space({ space, status, marks, focus, setFocus, highlighted, forceOpen }
           <Screen key={sc.id} screen={sc} spaceAgent={space.agent}
             marks={marks.filter(m => m.screen === sc.id)}
             focusPill={focus?.screen === sc.id ? focus.pill : null}
+            notes={notes[sc.id] || {}}
             onPill={n => setFocus({ screen: sc.id, pill: n })} />
         ))}
       </div>}
@@ -292,7 +297,12 @@ export default function App() {
 
   function scrollToTarget(t) {
     const el = document.getElementById(t.screen ? 'screen-' + t.screen : 'space-' + t.space)
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (!el) return
+    // The needs-you strip is sticky; measure its real height so the target and its mark land below it.
+    const strip = document.querySelector('.needs')
+    const offset = (strip ? strip.getBoundingClientRect().height : 0) + 16
+    const top = el.getBoundingClientRect().top + window.scrollY - offset
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
   }
 
   function goTo(item, { open = true } = {}) {
@@ -364,6 +374,20 @@ export default function App() {
     waitlist: x1?.resolution?.id === 'allow' ? 'all' : x1?.resolution?.id === 'copy' ? 'a' : 'none',
   }
 
+  // Legend notes that change with a ruling (F7). Pending wording comes back on Undo because the base note is untouched.
+  const notes = useMemo(() => {
+    const n = { a2: {} }
+    const r1 = p1?.resolution?.id
+    if (r1 === 'agree') n.a2[1] = { note: 'Astra proposed a way back other than the handle. Claude applied it: an X and a Back to event link, and the chosen session and entered details are kept.', ruled: 'Ruled: agreed. Applied by Claude.' }
+    if (r1 === 'decline') n.a2[1] = { note: 'Astra proposed a way back other than the handle. The handle stays the only way back; the reason is kept with the proposal.', ruled: 'Ruled: declined.' }
+    if (r1 === 'defer') n.a2[1] = { note: 'Astra proposed a way back other than the handle. Nothing changes now; the proposal returns at the next round.', ruled: 'Ruled: deferred to next round.' }
+    const r2 = x1?.resolution?.id
+    if (r2 === 'allow') n.a2[2] = { note: 'Shown as Full with a Join waitlist action. Session row was changed once, by Claude, with your permission; both directions show it.', ruled: 'Ruled: allowed once.' }
+    if (r2 === 'copy') n.a2[2] = { note: 'Shown as Full with a Join waitlist action on a local copy of Session row inside Direction A. Direction B is unchanged.', ruled: 'Ruled: local copy.' }
+    if (r2 === 'decline') n.a2[2] = { note: 'Shown as Full. Session row stays unchanged, so Direction A continues without a waitlist and says so.', ruled: 'Ruled: declined.' }
+    return n
+  }, [p1, x1])
+
   const marks = useMemo(() => {
     const m = []
     if (p1?.resolution) {
@@ -399,7 +423,7 @@ export default function App() {
           <Rounds rounds={ROUNDS} reviewing={reviewing} />
 
           <div className="spaces">
-            {SPACES.map(sp => <Space key={sp.id} space={sp} status={spaceStatus[sp.id]} marks={marks} focus={focus} setFocus={setFocus} highlighted={hi === sp.id} forceOpen={forceOpen[sp.id]} />)}
+            {SPACES.map(sp => <Space key={sp.id} space={sp} status={spaceStatus[sp.id]} marks={marks} focus={focus} setFocus={setFocus} highlighted={hi === sp.id} forceOpen={forceOpen[sp.id]} notes={notes} />)}
           </div>
 
           <Settings settings={settings} onChange={(id, v) => setSettings(s => s.map(x => x.id === id ? { ...x, value: v } : x))} />

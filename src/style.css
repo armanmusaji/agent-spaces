@@ -161,10 +161,9 @@ legend { font-weight: 600; margin-bottom: 4px; }
 .leg-tag { font-weight: 600; }
 .leg-note { opacity: 0.92; }
 .leg-agreed { opacity: 0.7; font-size: 13px; margin-top: 2px; }
+.leg-ruled { font-size: 13px; font-weight: 600; margin-top: 4px; color: var(--legend-claude); }
 .legend .who-claude { color: var(--legend-claude); }
 .legend .who-astra { color: var(--legend-astra); }
-.screen { scroll-margin-top: 150px; }
-.space { scroll-margin-top: 120px; }
 .status { font-weight: 600; }
 .status-review { color: var(--ok); }
 .space-hi { transition: box-shadow 0.3s; }
